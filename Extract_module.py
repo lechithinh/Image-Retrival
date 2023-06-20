@@ -5,6 +5,7 @@ import imutils
 import glob
 import numpy as np
 import csv
+from sklearn.cluster import KMeans
 
 
 class Descriptor:
@@ -58,10 +59,33 @@ class Descriptor:
         hist = cv2.normalize(hist, hist).flatten()
       # return the histogram
       return hist
+
+    def get_sift_features(self, img):
+      # Initialize the SIFT feature detector
+      sift = cv2.xfeatures2d.SIFT_create()
+
+      # Detect keypoints and compute descriptors
+      gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+      keypoints, descriptors = sift.detectAndCompute(gray, None)
+
+      # Perform k-means clustering on the descriptors
+      kmeans = KMeans(n_clusters=10)
+      kmeans.fit(descriptors)
+
+      # Create a histogram of the clusters for each image
+      hist = np.zeros(10)
+      for cluster in kmeans.predict(descriptors):
+          hist[cluster] += 1
+
+      # Normalize the histogram
+      hist /= len(keypoints)
+      return hist
+
   
 #this function is used to extract the data
 def main():
   cd = Descriptor((8, 12, 3))
+  # cd = Descriptor()
   dataset_path = "images"  
   index_path = "index.csv"  
 
@@ -73,6 +97,7 @@ def main():
       imageID = imagePath[imagePath.rfind("/") + 1:]
       image = cv2.imread(imagePath)
       features = cd.describe(image)
+      # features = cd.get_sift_features(image)
       features = [str(f) for f in features] 
       output.write("%s,%s\n" % (imageID, ",".join(features)))
 
