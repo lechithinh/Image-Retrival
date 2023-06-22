@@ -5,13 +5,12 @@ import imutils
 import glob
 import numpy as np
 import csv
-
 from skimage import feature
 
 class Descriptor:
     def __init__(self, bins):
       self.bins = bins
-    def describe(self, image):
+    def Historam_extract(self, image):
         # convert the image to the HSV color space and initialize
         # the features used to quantify the image
         image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
@@ -60,11 +59,12 @@ class Descriptor:
       # return the histogram
       return hist
   
-    def hog(self,image):
+    def Hog_extract(self,image):
         img = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
         img =cv2.resize(img, (128, 256))
         (hog, hog_image) = feature.hog(img, orientations=9,pixels_per_cell=(8, 8), cells_per_block=(2, 2),block_norm='L2-Hys', visualize=True)
         return hog.flatten()
+      
 #this function is used to extract the data
 def main():
   cd = Descriptor((8, 12, 3))
@@ -78,8 +78,13 @@ def main():
 
       imageID = imagePath[imagePath.rfind("/") + 1:]
       image = cv2.imread(imagePath)
-      features = cd.describe(image)
+      #features = cd.Historam_extract(image)
+      features = cd.Hog_extract(image)
+      print(features)
       features = [str(f) for f in features] 
       output.write("%s,%s\n" % (imageID, ",".join(features)))
+    
+  output.close()  
 
-  output.close()  output.close()
+if __name__ == "__main__":
+  main()

@@ -61,7 +61,7 @@ def Webapp():
                 
                 if uploaded_file is not None and search_button: 
                     #search image
-                    features = cd.describe(opencv_image)
+                    features = cd.Historam_extract(opencv_image)
                     
                     if search_models == "Chi2":
                         results = searcher.chi2_distance_search(features)
