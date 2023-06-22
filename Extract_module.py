@@ -6,6 +6,7 @@ import glob
 import numpy as np
 import csv
 
+from skimage import feature
 
 class Descriptor:
     def __init__(self, bins):
@@ -59,6 +60,11 @@ class Descriptor:
       # return the histogram
       return hist
   
+    def hog(self,image):
+        img = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
+        img =cv2.resize(img, (128, 256))
+        (hog, hog_image) = feature.hog(img, orientations=9,pixels_per_cell=(8, 8), cells_per_block=(2, 2),block_norm='L2-Hys', visualize=True)
+        return hog.flatten()
 #this function is used to extract the data
 def main():
   cd = Descriptor((8, 12, 3))
@@ -76,4 +82,4 @@ def main():
       features = [str(f) for f in features] 
       output.write("%s,%s\n" % (imageID, ",".join(features)))
 
-  output.close()
+  output.close()  output.close()
