@@ -65,6 +65,8 @@ class Searcher:
 def main():
   cd = Descriptor((8, 12, 3))
 
+  
+
 
 
   query = cv2.imread(r"images\2.jpg")
