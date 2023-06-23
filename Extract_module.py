@@ -6,6 +6,7 @@ import glob
 import numpy as np
 import csv
 from skimage import feature
+import os
 
 class Descriptor:
     def __init__(self, bins):
@@ -73,18 +74,45 @@ def main():
 
 
   output = open(index_path, "w")
-
-  for imagePath in glob.glob(dataset_path + "/*.jpg"): # check other ways to read this
-
-      imageID = imagePath[imagePath.rfind("/") + 1:]
-      image = cv2.imread(imagePath)
-      #features = cd.Historam_extract(image)
-      features = cd.Hog_extract(image)
-      print(features)
-      features = [str(f) for f in features] 
-      output.write("%s,%s\n" % (imageID, ",".join(features)))
-    
+  folder_paths = ['dataset/black_dress', 
+                  'dataset/black_pants', 
+                  'dataset/black_shirt', 
+                  'dataset/black_shoes', 
+                  'dataset/black_shorts', 
+                  'dataset/blue_dress', 
+                  'dataset/blue_pants', 
+                  'dataset/blue_shirt', 
+                  'dataset/blue_shoes', 
+                  'dataset/blue_shorts', 
+                  'dataset/brown_pants', 
+                  'dataset/brown_shoes', 
+                  'dataset/green_pants', 
+                  'dataset/green_shirt', 
+                  'dataset/green_shoes', 
+                  'dataset/green_shorts',
+                  'dataset/red_dress',
+                  'dataset/red_pants',
+                  'dataset/red_shoes',
+                  'dataset/white_dress',
+                  'dataset/white_pants',
+                  'dataset/green_shorts',
+                  'dataset/white_shorts',
+                  ]
+  folder = 0
+  for folder_path in folder_paths:
+    print("Folder",folder)
+    folder +=1
+    for filename in os.listdir(folder_path):
+        if filename.endswith('.jpg'):
+            image_path = os.path.join(folder_path, filename)
+            image = cv2.imread(image_path)
+            features = cd.Historam_extract(image)
+            features = [str(f) for f in features] 
+            output.write("%s,%s\n" % (f"{folder_path}/" + filename, ",".join(features)))
   output.close()  
+
+    
+
 
 if __name__ == "__main__":
   main()

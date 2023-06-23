@@ -54,25 +54,18 @@ class Searcher:
             d = self.cosine(features, queryFeatures)
           results[row[0]] = d
         f.close()
-      print("Before", results)
       if metric in ["Chi2", "Hellinger", "Euclidean"]:
         results = sorted([(v, k) for (k, v) in results.items()])
       else:
         results = [(v, k) for (k, v) in results.items()]
-      print("After", results)
       return results[:self.limit_image]
     
 def main():
   cd = Descriptor((8, 12, 3))
-
-  
-
-
-
-  query = cv2.imread(r"images\2.jpg")
-  features = cd.Hog_extract(query)
-  searcher = Searcher("index.csv")
-  results = searcher.Search("euclidean", features)
+  query = cv2.imread("dataset/black_shirt/0a4ed000d20e1f1ccc7effd23fa659dbda0e38a3.jpg")
+  features = cd.Historam_extract(query)
+  searcher = Searcher("index.csv", limit_image=10)
+  results = searcher.Search("Cosine", features)
 
   cv2.imshow("Query Image", query)
   for (score, resultID) in results:

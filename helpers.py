@@ -1,7 +1,7 @@
 import streamlit as st
 import numpy as np
 
-def paginator(label, items, items_per_page=10, on_sidebar=True):
+def paginator(label, items, items_per_page=50, on_sidebar=True):
     # Figure out where to display the paginator
     if on_sidebar:
         location = st.sidebar.empty()

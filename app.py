@@ -43,7 +43,7 @@ def Webapp():
                 with st.container():
                     col1, col2 = st.columns(2)
                     with col1:
-                        limit_image = st.slider('Select the limit image retrival', 0, 10, 1)  #the max = len (index.csv - row)  
+                        limit_image = st.slider('Select the limit image retrival', 0, 50, 1)  #the max = len (index.csv - row)  
                     with col2:
                         search_models = st.selectbox(
                             'Select search metrics',
@@ -80,6 +80,7 @@ def Webapp():
                     result_images = []
                     for (score, resultID) in results:
                         result_images.append(resultID)
+                        print(score, resultID)
                     
                     image_iterator = paginator("Select the total page", result_images)
                     indices_on_page, images_on_page = map(list, zip(*image_iterator))
