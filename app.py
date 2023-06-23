@@ -47,7 +47,7 @@ def Webapp():
                     with col2:
                         search_models = st.selectbox(
                             'Select search metrics',
-                                ('Chi2', 'Euclidean Distance', 'Dot Product'))
+                                ('Chi2', 'Euclidean', 'Hellinger', 'Cosine'))
                     search_button = st.form_submit_button("Search", type="primary")
             
             #models
@@ -55,6 +55,7 @@ def Webapp():
             searcher = Searcher(indexPath="index.csv", limit_image = limit_image)
             
             if uploaded_file is not None:
+                results = []
                 file_bytes = np.asarray(bytearray(uploaded_file.read()), dtype=np.uint8)
                 opencv_image = cv2.imdecode(file_bytes, 1)
                 st.image(opencv_image, channels="BGR", width=250)
@@ -64,13 +65,15 @@ def Webapp():
                     features = cd.Historam_extract(opencv_image)
                     
                     if search_models == "Chi2":
-                        results = searcher.chi2_distance_search(features)
-                    elif search_models == "Euclidean Distance":
-                        pass 
+                        results = searcher.Search('Chi2', features)
+                    elif search_models == "Euclidean":
+                        results = searcher.Search('Euclidean', features)
                         #call the code
-                    elif search_models == 'Dot Product':
-                        pass
-                        #call the code
+                    elif search_models == 'Hellinger':
+                        results = searcher.Search('Hellinger', features)
+                    elif search_models == "Cosine":
+                        results = searcher.Search('Cosine', features)
+
                         
                     
                     #show a list of images

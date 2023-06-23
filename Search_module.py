@@ -28,10 +28,15 @@ class Searcher:
       return cos_sim 
     def euclidean(self,vec1,vec2):
       pre_square_sum = 0
-      for idx,_ in enumerate(vec1):
-        pre_square_sum += (vec1[idx] - vec2[idx]) ** 2
+      length = min(len(vec1), len(vec2))
+
+      for index in range(length):
+        pre_square_sum += (vec1[index] - vec2[index])**2
+      return pre_square_sum
+      # for idx,_ in enumerate(vec1):
+      #   pre_square_sum += (vec1[idx] - vec2[idx]) ** 2
     
-      return sqrt(pre_square_sum)
+      # return sqrt(pre_square_sum)
       
     def Search(self, metric, queryFeatures):
       results = {}
@@ -41,16 +46,16 @@ class Searcher:
           features = [float(x) for x in row[1:]] 
           if metric == "Chi2":
             d = self.chi2_distance(features, queryFeatures)
-          elif metric == "hellinger":
+          elif metric == "Hellinger":
             d = self.hellinger(features, queryFeatures)
           elif metric == "Cosine":
             d = self.cosine(features, queryFeatures)
-          elif metric == "euclidean":
+          elif metric == "Euclidean":
             d = self.cosine(features, queryFeatures)
           results[row[0]] = d
         f.close()
       print("Before", results)
-      if metric in ["Chi2", "hellinger"]:
+      if metric in ["Chi2", "Hellinger", "Euclidean"]:
         results = sorted([(v, k) for (k, v) in results.items()])
       else:
         results = [(v, k) for (k, v) in results.items()]
