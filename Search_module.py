@@ -3,7 +3,7 @@ import cv2
 import glob
 import numpy as np
 import csv
-from Extract_module import Descriptor
+from simple_module import Descriptor
 from scipy.spatial.distance import euclidean
 from math import sqrt
 

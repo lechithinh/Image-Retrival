@@ -2,14 +2,15 @@ import streamlit as st
 from streamlit_option_menu import option_menu
 
 #for search module
-from Extract_module import Descriptor
+from simple_module import Descriptor
 from Search_module import Searcher
 import cv2
 import numpy as np
 from helpers import paginator
+from vgg_module import VGG_16
 
 
-
+model = VGG_16()
 
 def Webapp():
     with st.sidebar:
@@ -58,11 +59,19 @@ def Webapp():
                 results = []
                 file_bytes = np.asarray(bytearray(uploaded_file.read()), dtype=np.uint8)
                 opencv_image = cv2.imdecode(file_bytes, 1)
+                image = opencv_image.copy()
+                # Resize the image
+                resized_img = cv2.resize(image, (224, 224))
+                # Convert the image to RGB format
+                rgb_img = cv2.cvtColor(resized_img, cv2.COLOR_BGR2RGB)
+                
                 st.image(opencv_image, channels="BGR", width=250)
                 
                 if uploaded_file is not None and search_button: 
                     #search image
-                    features = cd.Historam_extract(opencv_image)
+             
+                    features = model.Vgg_extract(rgb_img)
+                    #features = cd.Historam_extract(opencv_image)
                     
                     if search_models == "Chi2":
                         results = searcher.Search('Chi2', features)
