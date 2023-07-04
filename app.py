@@ -1,16 +1,22 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
+from streamlit_cropper import st_cropper
+import requests
+from io import BytesIO
+from PIL import Image
 
-#for search module
+# for search module
 from simple_module import Descriptor
 from Search_module import Searcher
 import cv2
 import numpy as np
 from helpers import paginator
 from vgg_module import VGG_16
+from timer import Timer
 
 
-model = VGG_16()
+# model = VGG_16()
+
 
 def Webapp():
     with st.sidebar:
@@ -37,8 +43,16 @@ def Webapp():
             In the next versions, we plan to introduce even more advanced features. We welcome your collaboration and feedback as we strive to create a well-structured and effective platform.
             ''')
     elif selected == "Search System":
+
+        st.subheader('Upload image')
         upload_search, url_search = st.tabs(["Uploaded Image", "Url image"])
+
         with upload_search:
+            st.subheader('Choose feature extractor')
+            option = st.selectbox('.', ('VGG16', 'RGBHistogram', 'HOG'))
+
+            st.subheader('Choose image to upload')
+
             # upload image
             uploaded_file = st.file_uploader('')
 
@@ -73,23 +87,40 @@ def Webapp():
 
             if uploaded_file is not None:
                 results = []
-                file_bytes = np.asarray(
-                    bytearray(uploaded_file.read()), dtype=np.uint8)
+
+
+                file_bytes = np.asarray(bytearray(uploaded_file.read()), dtype=np.uint8)
+                # file_bytes = np.asarray(bytearray(cropped_img.tobytes()), dtype=np.uint8)
                 opencv_image = cv2.imdecode(file_bytes, 1)
+                size_o_image = opencv_image.shape
+                print(size_o_image)
+                #visualize image in order to crop
+                uploaded_img = Image.open(uploaded_file)
+                #crop image
+                cropped_img = st_cropper(uploaded_img, realtime_update=True, box_color='#FF0004')
+                
+                st.write("Preview")
+                _ = cropped_img.thumbnail((150,150))
+
+                cropped_arr = np.asarray(cropped_img, dtype=np.uint8)
+            
+                st.image(cropped_img)
+
+
+
+
                 image = opencv_image.copy()
                 # Resize the image
                 resized_img = cv2.resize(image, (224, 224))
                 # Convert the image to RGB format
                 rgb_img = cv2.cvtColor(resized_img, cv2.COLOR_BGR2RGB)
-                
-                st.image(opencv_image, channels="BGR", width=250)
-                
-                if uploaded_file is not None and search_button: 
-                    #search image
-             
-                    features = model.Vgg_extract(rgb_img)
-                    #features = cd.Historam_extract(opencv_image)
-                    
+
+                if uploaded_file is not None and search_button:
+                    # search image
+
+                    # features = model.Vgg_extract(cropped_img)
+                    features = cd.Historam_extract(cropped_arr)
+
                     if search_models == "Chi2":
                         results = searcher.Search('Chi2', features)
                     elif search_models == "Euclidean":

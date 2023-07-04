@@ -26,7 +26,7 @@ class VGG_16:
     def extract_features(self,image_path):
         print("Xu ly : ", image_path)
         img = Image.open(image_path)
-        img_tensor = self.image_preprocess(image_path)
+        img_tensor = self.image_preprocess(img)
 
         # Trich dac trung
         vector = self.model.predict(img_tensor)[0]
