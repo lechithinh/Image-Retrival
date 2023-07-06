@@ -50,6 +50,8 @@ class Searcher:
             reader = csv.reader(f)
             for row in reader:
                 features = [float(x) for x in row[1:]]
+                #get label name from dataset
+                # label_result = row[0][8:].split('/')[0]
                 if metric == "Chi2":
                     d = self.chi2_distance(features, queryFeatures)
                 elif metric == "Hellinger":
@@ -75,20 +77,21 @@ def main():
     t.tic()
     cd = Descriptor((8, 12, 3))
     query = cv2.imread(
-        "dataset/black_shirt/0a4ed000d20e1f1ccc7effd23fa659dbda0e38a3.jpg")
+        "dataset/black_dress/433a36e22273b3c314b57aa72c42270fbef8bf53.jpg")
     features = cd.Historam_extract(query)
     searcher = Searcher("index.csv", limit_image=10)
 
     results = searcher.Search("Cosine", features)
+    print(results)
     timeResult = t.toc()
     t.clear()
-    print(timeResult)
-    cv2.imshow("Query Image", query)
-    for (score, resultID) in results:
-        result = cv2.imread(resultID)
-        cv2.imshow(resultID, result)
-        cv2.waitKey(0)
-
+    print(len(results))
+    # print(timeResult)
+    # cv2.imshow("Query Image", query)
+    # for (score, resultID) in results:
+    #     result = cv2.imread(resultID)
+    #     cv2.imshow(resultID, result)
+    #     cv2.waitKey(0)
 
 if __name__ == "__main__":
     main()
