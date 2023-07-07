@@ -15,7 +15,6 @@ import numpy as np
 from helpers import paginator
 from vgg_module import VGG_16
 from timer import Timer
-
 from extract_features import Extract_feature
 
 

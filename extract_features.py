@@ -50,4 +50,4 @@ def Extract_feature(dataset_path, feature_path,feature_names):
         print(error)  
 
 #Run this 
-Extract_feature(dataset_path="dataset", feature_path="Features",feature_names=types)
+#Extract_feature(dataset_path="dataset", feature_path="Features",feature_names=types)
