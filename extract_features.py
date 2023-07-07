@@ -13,61 +13,41 @@ from simple_module import Descriptor
 from vgg_module import VGG_16
 
 
-# index_path = "index.csv"  # tương ứng với 1 method sẽ có 1 file csv
-# output = open(index_path, "w")
-# folder_paths = ['dataset/black_dress', 
-#                   #'dataset/black_pants', 
-#                   #'dataset/black_shirt', 
-#                   #'dataset/black_shoes', 
-#                   #'dataset/black_shorts', 
-#                   'dataset/blue_dress', 
-#                   #'dataset/blue_pants', 
-#                   #'dataset/blue_shirt', 
-#                   #'dataset/blue_shoes', 
-#                   #'dataset/blue_shorts', 
-#                   'dataset/brown_pants', 
-#                   #'dataset/brown_shoes', 
-#                   #'dataset/green_pants', 
-#                   #'dataset/green_shirt', 
-#                   #'dataset/green_shoes', 
-#                   #'dataset/green_shorts',
-#                   #'dataset/red_dress',
-#                   #'dataset/red_pants',
-#                   #'dataset/red_shoes',
-#                   #'dataset/white_dress',
-#                   #'dataset/white_pants',
-#                   #'dataset/green_shorts',
-#                   #'dataset/white_shorts',
-#                   ]
-dataset_path = "dataset"
 
 types = ['histogram','hog','vgg']
 cd = Descriptor((8, 12, 3))
 vgg = VGG_16()
 
-for dType in types:
-    dType_csv = "feature/" + dType + ".csv"
-    output = open(dType_csv, "w")
+def Extract_feature(dataset_path, feature_path,feature_names):
+    try: 
+        os.makedirs(feature_path, exist_ok=True)
+        # Create the empty CSV files
+        for feature in feature_names:
+            file_path = os.path.join(feature_path, f"{feature}.csv")
+            with open(file_path, "w") as output:
+                
+                for folder_path in os.listdir(dataset_path):
+                    print("Folder",folder_path)
+                    folder_path = dataset_path + "/" + folder_path
+                    for filename in os.listdir(folder_path):
+                        print(filename)
+                        if filename.endswith('.jpg'):
+                            image_path = os.path.join(folder_path, filename)
+                            image = cv2.imread(image_path)
+                            #model
+                            if feature == 'vgg':
+                                features = vgg.extract_features(image_path)
+                            elif feature == 'histogram':
+                                features = cd.Historam_extract(image)
+                            else:
+                                features = cd.Hog_extract(image)
+                            features = [str(f) for f in features] 
+                            output.write("%s,%s\n" % (f"{folder_path}/" + filename, ",".join(features)))
 
-    for folder_path in os.listdir(dataset_path):
-        folder = 0
-        print("Folder",folder)
-        folder +=1
-        folder_path = dataset_path + "/" + folder_path
-        for filename in os.listdir(folder_path):
-            print(filename)
-            if filename.endswith('.jpg'):
-                image_path = os.path.join(folder_path, filename)
-                image = cv2.imread(image_path)
-                #model
-                if dType == 'vgg':
-                    features = vgg.extract_features(image_path)
-                elif dType == 'histogram':
-                    features = cd.Historam_extract(image)
-                else:
-                    features = cd.Hog_extract(image)
-                #features = cd.Historam_extract(image)
-                features = [str(f) for f in features] 
-                output.write("%s,%s\n" % (f"{folder_path}/" + filename, ",".join(features)))
+            output.close()  
 
-    output.close()  
+    except OSError as error: 
+        print(error)  
+
+#Run this 
+Extract_feature(dataset_path="dataset", feature_path="Features",feature_names=types)
