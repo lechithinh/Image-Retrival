@@ -20,3 +20,13 @@ def paginator(label, items, items_per_page=50, on_sidebar=True):
     max_index = min_index + items_per_page
     import itertools
     return itertools.islice(enumerate(items), min_index, max_index)
+
+def initialize_result(results):
+    labels = dict()
+    for index in range(len(results)):
+        label = results[index][-1].split('/')[1]
+        labels[label] = 0
+    for index in range(len(results)):
+        label = results[index][-1].split('/')[1]
+        labels[label] += 1
+    return labels
