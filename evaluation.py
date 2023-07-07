@@ -50,8 +50,10 @@ def mean_average_precision(ap):
 
 def main():
   cd = Descriptor((8, 12, 3))
-  query = cv2.imread("dataset/black_dress/433a36e22273b3c314b57aa72c42270fbef8bf53.jpg")
-  features = cd.Historam_extract(query)
+  query1 = cv2.imread("dataset/black_dress/433a36e22273b3c314b57aa72c42270fbef8bf53.jpg")
+  query2 = cv2.imread("dataset/blue_dress/9cd3a4c79350968817a6146c5ba6bfec5c780b8a.jpg")
+  query3 = cv2.imread("dataset/blue_pants/0aa249793bcde3fd4ab53ed17062beb2f24782c4.jpg")
+  features = cd.Historam_extract(query2)
   searcher = Searcher("index.csv", limit_image=40)
   label_results = []
 
@@ -64,12 +66,18 @@ def main():
     label_results.append(label_result)
   print(label_results)
   ground_truth = 'black_dress'
+  
   ap = calculate_AP(ground_truth, label_results)
   print(mean_average_precision(ap))
 
+  print('----precision------')
+  precision = calculate_precision(ground_truth, label_results)
+  print(precision)
+  print('recall')
+  recall = calculate_recall(ground_truth, label_results, 50)
+  print(recall)
+  print('f1-score', f1_score(precision, recall))
   
-  
-
 
 
 if __name__ == "__main__":

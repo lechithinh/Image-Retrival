@@ -7,7 +7,7 @@ from simple_module import Descriptor
 from scipy.spatial.distance import euclidean
 from math import sqrt
 from timer import Timer
-
+from sklearn.neighbors import NearestNeighbors
 
 class Searcher:
     def __init__(self, indexPath, limit_image=1):
@@ -30,7 +30,7 @@ class Searcher:
         norm_b = sum(b*b for b in vec_b) ** 0.5
 
         cos_sim = dot / (norm_a*norm_b)
-        return cos_sim
+        return 1 - cos_sim
 
     def euclidean(self, vec1, vec2):
         pre_square_sum = 0
@@ -48,6 +48,8 @@ class Searcher:
         results = {}
         with open(self.indexPath) as f:
             reader = csv.reader(f)
+
+
             for row in reader:
                 features = [float(x) for x in row[1:]]
                 #get label name from dataset
@@ -62,7 +64,7 @@ class Searcher:
                     d = self.cosine(features, queryFeatures)
                 results[row[0]] = d
             f.close()
-        if metric in ["Chi2", "Hellinger", "Euclidean"]:
+        if metric in ["Chi2", "Hellinger", "Euclidean", "Cosine"]:
             results = sorted([(v, k) for (k, v) in results.items()])
         else:
             results = [(v, k) for (k, v) in results.items()]
@@ -81,11 +83,11 @@ def main():
     features = cd.Historam_extract(query)
     searcher = Searcher("index.csv", limit_image=10)
 
-    results = searcher.Search("Cosine", features)
-    print(results)
+    searcher.Search("Cosine", features)
+    # print(results)
     timeResult = t.toc()
     t.clear()
-    print(len(results))
+    # print(len(results))
     # print(timeResult)
     # cv2.imshow("Query Image", query)
     # for (score, resultID) in results:
