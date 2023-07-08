@@ -147,12 +147,16 @@ def Webapp():
 
                     end = time.time()
                     st.markdown('**Finish in ' + str(end - start) + ' seconds**')
-
+                    print(query_image)
                     result_images = []
+                    link_images = []
                     for u in range(len(retriev)):
                         image = Image.open(image_list[retriev[u]])
                         
                         result_images.append(image)
+                        link_images.append(str(image_list[u]))
+                    
+                    print(link_images)
                     image_iterator = paginator("Select the total page", result_images)
                     indices_on_page, images_on_page = map(list, zip(*image_iterator))
                     st.image(images_on_page, width=200, caption=indices_on_page)
