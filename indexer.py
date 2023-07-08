@@ -38,10 +38,14 @@ def Indexing_feature(image_path, feature_descriptor,batch_size = 64):
     dataloader = DataLoader(dataset,batch_size=batch_size,sampler=sampler)
 
     indexer = get_faiss_indexer(descriptor.shape)
+    image_number = 1
     for images, image_paths in dataloader:
+        print("Image Number", image_number)
+        image_number += 1
         images = images.to(device)
         features = descriptor.extract_features(images)
         # print(features.shape)
+        #store to csv -> chon cosin -> quét qua này
         indexer.add(features)
     
     # Save features
@@ -58,6 +62,6 @@ def Indexing_feature(image_path, feature_descriptor,batch_size = 64):
     print('Finish in ' + str(end - start) + ' seconds')
 
 if __name__ == '__main__':
-    image_root = 'dataset/black_dress'
+    image_root = 'dataset'
     feature_descriptor = ['Resnet50', 'VGG16', 'RGBHistogram', 'LBP']
     Indexing_feature(image_path=image_root, feature_descriptor = feature_descriptor[1])

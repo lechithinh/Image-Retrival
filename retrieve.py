@@ -15,7 +15,7 @@ from dataloader import get_transformation
 
 FEATURE_PATH = 'feature'
 
-def get_image_list(image_root = 'dataset/black_dress'):
+def get_image_list(image_root = 'dataset'):
     image_root = pathlib.Path(image_root)
     image_list = list()
     for image_path in image_root.iterdir():

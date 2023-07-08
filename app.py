@@ -17,7 +17,7 @@ from PIL import Image
 from helpers import paginator
 from streamlit_cropper import st_cropper
 from retrieve import get_image_list, retrieve_image
-
+from indexer import Indexing_feature
 device = torch.device('cpu')
 image_root = 'dataset/black_dress'
 feature_root = 'feature'
@@ -53,15 +53,14 @@ def Webapp():
                     with col1:
                         dataset_path = st.text_input("Enter the path of dataset")
                     with col2:
-                        feature_names = st.multiselect(
+                        feature_descriptor = st.selectbox(
                                 'Select the feature options',
-                                ['histogram','hog','vgg'],
-                                ['histogram', 'hog','vgg'])
+                                ['Resnet50', 'VGG16', 'RGBHistogram', 'LBP'],)
                     extract_button = st.form_submit_button(
-                        "Search", type="primary")
+                        "Extract", type="primary")
                     
                     if extract_button:
-                        Extract_feature(dataset_path = dataset_path, feature_path = 'Test', feature_names= feature_names)
+                        Indexing_feature(dataset_path, feature_descriptor)
     
     elif selected == "Search System":
         st.subheader('Upload image')
@@ -81,9 +80,6 @@ def Webapp():
             # configure
             image_mode = st.selectbox("Select image mode", ["Full Image", "Crop Image"])
    
-                  
-
-
             if uploaded_file is not None:
                 results = []
 
