@@ -10,6 +10,7 @@ import os
 
 def Indexing_feature(image_path, feature_descriptor,batch_size = 64):
     FEATURE_PATH = 'feature'
+    DATASET_PATH = 'dataset'
     try: 
         os.makedirs(FEATURE_PATH, exist_ok=True)
     except:
@@ -39,14 +40,18 @@ def Indexing_feature(image_path, feature_descriptor,batch_size = 64):
 
     indexer = get_faiss_indexer(descriptor.shape)
     image_number = 1
-    for images, image_paths in dataloader:
-        print("Image Number", image_number)
-        image_number += 1
-        images = images.to(device)
-        features = descriptor.extract_features(images) #64 đặc trưng => xử lý tên file, vector...
-        # print(features.shape)
-        #store to csv 
-        indexer.add(features) #store faisss
+    csv_path = os.path.join(FEATURE_PATH, f"{feature_descriptor}.csv")
+    with open(csv_path,"w") as output:
+        for images, image_paths in dataloader:
+            print("Image Number", image_number)
+            image_number += 1
+            images = images.to(device)
+            features = descriptor.extract_features(images) #64 đặc trưng => xử lý tên file, vector...
+            indexer.add(features) #store faisss
+            #store to csv 
+            for i in range(0,features.shape[0]):
+                feature = [str(f) for f in features[i]] 
+                output.write("%s,%s\n" % (f"{DATASET_PATH}/" + image_paths[i].split("\\")[1], ",".join(feature)))
     
     # Save features
     feature_file = FEATURE_PATH + '/' + feature_descriptor + '.index.bin'

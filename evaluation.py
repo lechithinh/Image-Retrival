@@ -61,6 +61,7 @@ def mean_average_precision(ap):
     return np.mean(ap)
 
 
+
 def Evaluate(image_root = 'dataset', option = 'VGG16', limit_image = 30):
     image_root = 'dataset'
     FEATURE_PATH = 'feature'
@@ -87,12 +88,14 @@ def Evaluate(image_root = 'dataset', option = 'VGG16', limit_image = 30):
             # reset mảng AP cho class tiếp theo
             # print(AP_list)
             AP_list = []
+
             previous_label = class_name
             # print(mAP_list)
         # faiss / if else chọn search khác
         query_image = Image.open(uploaded_file)
         retriev = retrieve_image(query_image, option, limit_image)
         # 30 phần tử
+
         image_list = get_image_list(image_root)
         # danh sách ảnh => toàn bộ ảnh
         class_list = []
