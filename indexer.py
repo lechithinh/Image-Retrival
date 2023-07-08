@@ -43,10 +43,10 @@ def Indexing_feature(image_path, feature_descriptor,batch_size = 64):
         print("Image Number", image_number)
         image_number += 1
         images = images.to(device)
-        features = descriptor.extract_features(images)
+        features = descriptor.extract_features(images) #64 đặc trưng => xử lý tên file, vector...
         # print(features.shape)
-        #store to csv -> chon cosin -> quét qua này
-        indexer.add(features)
+        #store to csv 
+        indexer.add(features) #store faisss
     
     # Save features
     feature_file = FEATURE_PATH + '/' + feature_descriptor + '.index.bin'
