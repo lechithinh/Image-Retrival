@@ -1,8 +1,6 @@
 import numpy as np
 import os
 import cv2
-from storage.Search_module import Searcher
-from storage.simple_module import Descriptor
 from PIL import Image
 from retrieve import get_image_list, retrieve_image
 import base64
@@ -14,8 +12,6 @@ def calculate_precision(retrieval, labels):
         if value == retrieval:
             relevant += 1
     return relevant / len(labels)
-
-
 def calculate_recall(retrieval, labels, total_relevants):
 
     relevant = 0
@@ -23,115 +19,80 @@ def calculate_recall(retrieval, labels, total_relevants):
         if value == retrieval:
             relevant += 1
     return relevant / total_relevants
-
-
 def f1_score(precision, recall):
     return 2*(precision * recall) / (precision + recall)
 
 
-def calculate_AP(retrieval, labels):
-    # retrievals is a label of each retried image -> set equal to label of input image
-    retrievals = [retrieval for x in range(len(labels))]
+def calculate_AP(class_query, class_list): #class name, class_list
     precisions = []
-    r_k = [] #r_k[] is array of relavant image if rue r_k = 1 else r_k = 0
-    pos = 0 # pos is number of precision in k-th
-    num = 0 #image thu k-th
-    for retrieval, label in zip(retrievals, labels):
-        num += 1
-        if retrieval == label: #if retrival image == label
-            r_k.append(1)
+    relenvance = [] #If the class in class list is the same as the retrival = 1, otherwise = 0 (dài bằng labels)
+    pos = 0 # tử thứ k
+    num = 0 #mẫu thứ k
+    for class_name in class_list:
+        num += 1 #mẫu sẽ tăng theo mỗi lần lặp
+        if class_query == class_name: #if retrival image giống label
+            relenvance.append(1)
             pos += 1
         else:
-            r_k.append(0)
-        precisions.append(pos/num) #calculate precsion thu k
+            relenvance.append(0)
+        precisions.append(float(pos/num)) #calculate precsion thứ K
+        
     precision_r = 0
-    RD = 0 # RD is number relevant image
+    n_of_correct_class =  sum(relenvance) 
 
     #calculate AP in query thu i
     for i in range(len(precisions)):
-        if r_k[i] == 1:
-            RD += 1
-        precision_r += precisions[i]*r_k[i]
+        precision_r += precisions[i]*relenvance[i]
     #if relevant image  = 0 -> AP = 0
-    if RD == 0:
+    if n_of_correct_class == 0:
         return 0
     else:
-      return 1/RD * precision_r
+        AP = 1/n_of_correct_class * precision_r
+        return AP
 
 
 def mean_average_precision(ap):
     return np.mean(ap)
 
-def compute_mean_average(image_root, option, limit_image=30):
-  image_root = 'dataset'
+def Evaluate(image_root = 'dataset', option = 'VGG16', limit_image = 30):
+   
 
-  ap = []
-  mAP = []
-  option = option
-  limit_image = limit_image
-  # search_model = 'Faiss'
-  previous_label = os.listdir(image_root)[0].split(' ')[0]
-  for filename in os.listdir(image_root):
-      uploaded_file = image_root + '/' + filename
-      label = filename.split(' ')[0]
-      if previous_label == label:
-        previous_label = label
-      else:
-          mAP.append(mean_average_precision(np.array(ap)))
-          ap = []
-      query_image = Image.open(uploaded_file)
-  # search image
-      retriev = retrieve_image(query_image, option, limit_image)
-  # get the dataset to display
-      image_list = get_image_list(image_root)
-
-      result_images = []
-      link_images = []
-      for u in range(len(retriev)):
-          image = Image.open(image_list[retriev[u]])
-          result_images.append(image)
-
-          link_images.append((str(image_list[retriev[u]]).split('\\')[1]).split(' ')[0])
-      #calculate ap in query i-th
-      ap.append(calculate_AP(label, link_images))
-  return np.mean(mAP)
-def main():
-    image_root = 'dataset'
-
-    ap = []
-    mAP = []
+    AP_list = [] #AP cho mỗi class
+    mAP_list = [] #mAP của mỗi class -> tính mean của mAP này
     previous_label = os.listdir(image_root)[0].split(' ')[0]
+    #back_dress
     for filename in os.listdir(image_root):
         uploaded_file = image_root + '/' + filename
-        label = filename.split(' ')[0]
-        if previous_label == label:
-          previous_label = label
+        class_name = filename.split(' ')[0] #black dress
+        if previous_label == class_name:
+          previous_label = class_name
         else:
-            print(ap)
-            mAP.append(mean_average_precision(np.array(ap)))
-            ap = []
-            print(mAP)
-            print(link_images)
-            break
+            #in ra 30 AP tấm hình trước đó
+            print(AP_list) 
+            #nếu mà qua class mới thì tính mAP của class trước đó
+            mAP = mean_average_precision(np.array(AP_list))
+            mAP_list.append(mAP)
+            #reset mảng AP cho class tiếp theo
+            AP_list = []
+        #faiss / if else chọn search khác
         query_image = Image.open(uploaded_file)
-        option = 'VGG16'
-        limit_image = 30
-        search_model = 'Faiss'
-    # search image
         retriev = retrieve_image(query_image, option, limit_image)
-    # get the dataset to display
+        #30 phần tử
         image_list = get_image_list(image_root)
-
-        result_images = []
-        link_images = []
+        #danh sách ảnh => toàn bộ ảnh
+        class_list = []
+        #30 black dress, black pant
         for u in range(len(retriev)):
-            image = Image.open(image_list[retriev[u]])
-            result_images.append(image)
-
-            link_images.append((str(image_list[retriev[u]]).split('\\')[1]).split(' ')[0])
+            image_link = (str(image_list[retriev[u]]).split('\\')[1]).split(' ')[0]
+            class_list.append(image_link)
         #calculate ap in query i-th
-        ap.append(calculate_AP(label, link_images))
-
+        
+        #black dress -> 30 class khác 
+        AP = calculate_AP(class_name, class_list)
+        AP_list.append(AP)
+    return mAP_list, np.mean(mAP_list)
 
 if __name__ == "__main__":
-    main()
+    options = ['VGG16', 'RGBHistogram', 'LBP']
+    mAP_list, mAP_final = Evaluate(option=options[1])
+    #tính cho cả thằng eluc + cosion
