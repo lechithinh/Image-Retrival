@@ -62,46 +62,75 @@ def calculate_AP(retrieval, labels):
 def mean_average_precision(ap):
     return np.mean(ap)
 
+def compute_mean_average(image_root, option, limit_image=30):
+  image_root = 'dataset'
 
+  ap = []
+  mAP = []
+  option = option
+  limit_image = limit_image
+  # search_model = 'Faiss'
+  previous_label = os.listdir(image_root)[0].split(' ')[0]
+  for filename in os.listdir(image_root):
+      uploaded_file = image_root + '/' + filename
+      label = filename.split(' ')[0]
+      if previous_label == label:
+        previous_label = label
+      else:
+          mAP.append(mean_average_precision(np.array(ap)))
+          ap = []
+      query_image = Image.open(uploaded_file)
+  # search image
+      retriev = retrieve_image(query_image, option, limit_image)
+  # get the dataset to display
+      image_list = get_image_list(image_root)
+
+      result_images = []
+      link_images = []
+      for u in range(len(retriev)):
+          image = Image.open(image_list[retriev[u]])
+          result_images.append(image)
+
+          link_images.append((str(image_list[retriev[u]]).split('\\')[1]).split(' ')[0])
+      #calculate ap in query i-th
+      ap.append(calculate_AP(label, link_images))
+  return np.mean(mAP)
 def main():
     image_root = 'dataset'
 
     ap = []
     mAP = []
-    count = 0
+    previous_label = os.listdir(image_root)[0].split(' ')[0]
     for filename in os.listdir(image_root):
         uploaded_file = image_root + '/' + filename
         label = filename.split(' ')[0]
-
+        if previous_label == label:
+          previous_label = label
+        else:
+            print(ap)
+            mAP.append(mean_average_precision(np.array(ap)))
+            ap = []
+            print(mAP)
+            print(link_images)
+            break
         query_image = Image.open(uploaded_file)
         option = 'VGG16'
         limit_image = 30
         search_model = 'Faiss'
     # search image
-
         retriev = retrieve_image(query_image, option, limit_image)
-
     # get the dataset to display
         image_list = get_image_list(image_root)
 
         result_images = []
         link_images = []
         for u in range(len(retriev)):
-            count += 1
             image = Image.open(image_list[retriev[u]])
             result_images.append(image)
 
-            link_images.append((str(image_list[u]).split('\\')[1]).split(' ')[0])
+            link_images.append((str(image_list[retriev[u]]).split('\\')[1]).split(' ')[0])
         #calculate ap in query i-th
         ap.append(calculate_AP(label, link_images))
-        if count == 30:
-            count = 0
-            print(ap)
-            ap = []
-            mAP = mean_average_precision(np.array(ap))
-            print(mAP)
-            print(link_images)
-            break
 
 
 if __name__ == "__main__":
