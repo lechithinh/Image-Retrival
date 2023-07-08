@@ -5,6 +5,7 @@ from io import BytesIO
 from helpers import initialize_result
 import pandas as pd
 
+
 # for search module
 import cv2
 import numpy as np
@@ -18,6 +19,8 @@ from helpers import paginator
 from streamlit_cropper import st_cropper
 from retrieve import get_image_list, retrieve_image
 from indexer import Indexing_feature
+from st_aggrid import AgGrid
+import altair as alt
 device = torch.device('cpu')
 image_root = 'dataset/black_dress'
 feature_root = 'feature'
@@ -162,7 +165,22 @@ def Webapp():
                     st.image(images_on_page, width=200, caption=indices_on_page)
             
                     #show the chart
-                    # labels = dict()
-                    # labels = initialize_result(results)
-                    # st.bar_chart(pd.DataFrame(labels.values(), labels.keys()))
+                    
+                    labels = dict()
+                    labels = initialize_result(link_images)
+                    
+                    st.subheader('Statistics')
+                    AgGrid(pd.DataFrame(labels), fit_columns_on_grid_load = True, editable=True)
+                    st.subheader('Char chart')
+                    chart = (
+                        alt.Chart(pd.DataFrame(labels))
+                        .mark_bar()
+                        .encode(
+                            x='labels',
+                            y='values',
+                            color='labels:N'
+                        ).interactive()
+                        
+                    )
+                    st.altair_chart(chart, use_container_width =True)
 
