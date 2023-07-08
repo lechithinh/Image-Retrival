@@ -54,7 +54,7 @@ def calculate_AP(class_query, class_list): #class name, class_list
 def mean_average_precision(ap):
     return np.mean(ap)
 
-def Evaluate(image_root = 'dataset', option = 'VGG16', limit_image = 30):
+def Evaluate(image_root = 'dataset', option = 'VGG16', search = 'faiss', limit_image = 30):
     image_root = 'dataset'
     FEATURE_PATH = 'feature'
     if os.path.exists(FEATURE_PATH + "/" + option + ".index.bin") == False:
@@ -78,8 +78,13 @@ def Evaluate(image_root = 'dataset', option = 'VGG16', limit_image = 30):
             #reset mảng AP cho class tiếp theo
             AP_list = []
         #faiss / if else chọn search khác
+        
         query_image = Image.open(uploaded_file)
-        retriev = retrieve_image(query_image, option, limit_image)
+        if search == 'faiss':
+            retriev = retrieve_image(query_image, option, limit_image)
+        elif search == 'Cosine':
+        elif search == 'Euclidean': 
+            
         #30 phần tử
         image_list = get_image_list(image_root)
         #danh sách ảnh => toàn bộ ảnh
