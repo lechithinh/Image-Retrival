@@ -4,7 +4,7 @@ import cv2
 from PIL import Image
 from retrieve import get_image_list, retrieve_image
 import base64
-
+from indexer import Indexing_feature
 
 def calculate_precision(retrieval, labels):
     relevant = 0
@@ -55,7 +55,10 @@ def mean_average_precision(ap):
     return np.mean(ap)
 
 def Evaluate(image_root = 'dataset', option = 'VGG16', limit_image = 30):
-   
+    image_root = 'dataset'
+    FEATURE_PATH = 'feature'
+    if os.path.exists(FEATURE_PATH + "/" + option + ".index.bin") == False:
+        Indexing_feature(image_root,option)
 
     AP_list = [] #AP cho mỗi class
     mAP_list = [] #mAP của mỗi class -> tính mean của mAP này
