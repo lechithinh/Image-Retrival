@@ -30,11 +30,14 @@ def paginator(label, items, items_per_page=50, on_sidebar=True):
     return itertools.islice(enumerate(items), min_index, max_index)
 
 def initialize_result(results):
-    labels = dict()
-    for index in range(len(results)):
-        label = results[index][-1].split('/')[1]
-        labels[label] = 0
-    for index in range(len(results)):
-        label = results[index][-1].split('/')[1]
-        labels[label] += 1
+    labels = {'labels': [],
+              'values': []}
+    for i in range(len(results)):
+        label = (results[i].split('\\')[-1]).split(' ')[0]
+        if label not in labels['labels']:
+            labels['labels'].append(label)
+            labels['values'].append(1)
+        else:
+            indx = list(labels['labels']).index(label)
+            labels['values'][indx] += 1
     return labels
