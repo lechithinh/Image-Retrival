@@ -64,4 +64,4 @@ def Indexing_feature(image_path, feature_descriptor,batch_size = 64):
 if __name__ == '__main__':
     image_root = 'dataset'
     feature_descriptor = ['Resnet50', 'VGG16', 'RGBHistogram', 'LBP']
-    Indexing_feature(image_path=image_root, feature_descriptor = feature_descriptor[1])
+    Indexing_feature(image_path=image_root, feature_descriptor = feature_descriptor[2])
