@@ -6,7 +6,7 @@ from argparse import ArgumentParser
 import torch
 import faiss
 
-from feature_module import MyResnet50, MyVGG16, RGBHistogram, LBP
+from descriptor import MyResnet50, MyVGG16, RGBHistogram, LBP
 from dataloader import get_transformation
 
 ACCEPTED_IMAGE_EXTS = ['.jpg', '.png']

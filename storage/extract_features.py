@@ -9,8 +9,8 @@ from skimage import feature
 import os
 
 #import module
-from simple_module import Descriptor
-from vgg_module import VGG_16
+from storage.simple_module import Descriptor
+from storage.vgg_module import VGG_16
 
 
 

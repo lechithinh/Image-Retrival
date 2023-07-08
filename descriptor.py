@@ -18,7 +18,7 @@ class MyResnet50(torch.nn.Module):
         self.modules = list(self.model.children())[:-1]
         self.model = nn.Sequential(*self.modules)
         self.model = self.model.eval()
-        #self.model = self.model.to(device)
+        self.model = self.model.to(device)
         self.shape = 2048 # the length of the feature vector
 
     def extract_features(self, image):

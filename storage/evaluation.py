@@ -1,8 +1,8 @@
 import numpy as np
 import os
 import cv2
-from Search_module import Searcher
-from simple_module import Descriptor
+from storage.Search_module import Searcher
+from storage.simple_module import Descriptor
 
 def calculate_precision(retrieval, labels):
   relevant = 0
