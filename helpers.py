@@ -1,5 +1,13 @@
 import streamlit as st
 import numpy as np
+import faiss
+
+
+def get_faiss_indexer(shape):
+
+    indexer = faiss.IndexFlatL2(shape) # features.shape[1]
+
+    return indexer
 
 def paginator(label, items, items_per_page=50, on_sidebar=True):
     # Figure out where to display the paginator

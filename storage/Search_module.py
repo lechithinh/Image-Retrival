@@ -3,10 +3,10 @@ import cv2
 import glob
 import numpy as np
 import csv
-from simple_module import Descriptor
+from storage.simple_module import Descriptor
 from scipy.spatial.distance import euclidean
 from math import sqrt
-from timer import Timer
+
 from sklearn.neighbors import NearestNeighbors
 
 class Searcher:
@@ -75,8 +75,7 @@ class Searcher:
           return results
 
 def main():
-    t = Timer()
-    t.tic()
+
     cd = Descriptor((8, 12, 3))
     query = cv2.imread(
         "dataset/black_dress/433a36e22273b3c314b57aa72c42270fbef8bf53.jpg")
@@ -84,16 +83,8 @@ def main():
     searcher = Searcher("index.csv", limit_image=10)
 
     searcher.Search("Cosine", features)
-    # print(results)
-    timeResult = t.toc()
-    t.clear()
-    # print(len(results))
-    # print(timeResult)
-    # cv2.imshow("Query Image", query)
-    # for (score, resultID) in results:
-    #     result = cv2.imread(resultID)
-    #     cv2.imshow(resultID, result)
-    #     cv2.waitKey(0)
+ 
+
 
 if __name__ == "__main__":
     main()
