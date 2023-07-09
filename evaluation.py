@@ -6,6 +6,7 @@ from PIL import Image
 from retrieve import get_image_list, retrieve_image, Search
 import base64
 from indexer import Indexing_feature
+import time
 
 def calculate_precision(retrieval, labels):
     relevant = 0
@@ -75,9 +76,13 @@ def Evaluate(image_root = 'dataset', option = 'VGG16', search = 'Faiss', limit_i
     # back_dress
     image_count = 0
     label = []
+    
+    durations = []
+    #Thời gian truy vấn trung bình của mỗi class
+    time_each_class = []
     for filename in os.listdir(image_root):
         image_count += 1
-        print(image_count)
+        
         uploaded_file = image_root + '/' + filename
         class_name = filename.split(' ')[0]  # black dress
         if previous_label == class_name:
@@ -93,10 +98,16 @@ def Evaluate(image_root = 'dataset', option = 'VGG16', search = 'Faiss', limit_i
             AP_list = []
             label.append(previous_label)
             previous_label = class_name
+            time_each_class.append(np.mean(durations))
+            durations = []
             # print(mAP_list)
         # faiss / if else chọn search khác
         # danh sách ảnh => toàn bộ ảnh
         class_list = []
+
+        #start count time
+        start = time.time()
+        # t.tic()
         query_image = Image.open(uploaded_file)
         if search == 'Faiss':
             retriev = retrieve_image(query_image, option, limit_image)
@@ -115,6 +126,12 @@ def Evaluate(image_root = 'dataset', option = 'VGG16', search = 'Faiss', limit_i
                 image_link = (item[1].split('/')[1]).split(' ')[0]
                 class_list.append(image_link)
         # calculate ap in query i-th
+        # duration = t.toc()
+        #end count time (time = retrieval + search)
+        duration = time.time() - start
+        durations.append(duration)
+
+        # t.clear()
 
         # black dress -> 30 class khác
         AP = calculate_AP(class_name, class_list)
@@ -123,10 +140,12 @@ def Evaluate(image_root = 'dataset', option = 'VGG16', search = 'Faiss', limit_i
             label.append(previous_label)
             mAP = mean_average_precision(np.array(AP_list))
             mAP_list.append(mAP)
+            time_each_class.append(np.mean(durations))
+            durations = []
         # print(class_list)
 
     MMAP = np.mean(mAP_list)
-    return mAP_list, MMAP,label
+    return mAP_list, MMAP,label, time_each_class
 
 def get_label():
     label = set()
@@ -135,36 +154,37 @@ def get_label():
         label.add(filename.split(' ')[0])
     return label
 
-def store_mmap(option,search,MMAP,mAP_list,label,limit_image=30):
+def store_mmap(option,search,MMAP,mAP_list,label,time_each_class ,limit_image=30):
     RESULT_PATH = "result"
     CSV_PATH = os.path.join(RESULT_PATH,"MMAP.csv")
+    mean_time = np.mean(time_each_class)
     if os.path.exists(CSV_PATH):
         idx = len(pd.read_csv(CSV_PATH)) + 1
         with open (CSV_PATH,'a') as file:
-            output = f"{idx},{option},{search},{limit_image},{MMAP}"
+            output = f"{idx},{option},{search},{limit_image},{MMAP},{mean_time}"
             file.write('\n'+output)
     else:
         idx = 1
         with open (CSV_PATH,'w') as file:
-            file.write("ID,Method,Search,Limit Image,MMAP")
-            output = f"{idx},{option},{search},{limit_image},{MMAP}"
+            file.write("ID,Method,Search,Limit Image,MMAP,Time_each_retrieve")
+            output = f"{idx},{option},{search},{limit_image},{MMAP},{mean_time}"
             file.write('\n'+output)
-    store_map(idx,mAP_list,label)
+    store_map(idx,mAP_list,label, time_each_class)
 
-def store_map(idx,mAP_list,label):
+def store_map(idx,mAP_list,label, time_each_class):
     RESULT_PATH = "result"
     CSV_PATH = os.path.join(RESULT_PATH,"mAP.csv")
     if os.path.exists(CSV_PATH):
         with open (CSV_PATH,'a') as file:
             for i in range(0,len(mAP_list)):
-                output = f"{idx},{label[i]},{mAP_list[i]}"
+                output = f"{idx},{label[i]},{mAP_list[i], {time_each_class[i]}}"
                 file.write('\n'+output)
 
     else:
         with open (CSV_PATH,'w') as file:
-            file.write("Id_MMAP,Class,mAP")
+            file.write("Id_MMAP,Class,mAP,Time")
             for i in range(0,len(mAP_list)):
-                output = f"{idx},{label[i]},{mAP_list[i]},"
+                output = f"{idx},{label[i]},{mAP_list[i], {time_each_class[i]}}"
                 file.write('\n'+output)
 
 def store_infor():
@@ -174,13 +194,14 @@ def store_infor():
     limit_image = 30
     for option in options:
         for search in searchs:
-            mAP_list, mAP_final,label = Evaluate(option=option, search=search)
+            mAP_list, mAP_final,label = Evaluate(image_root = 'Test', option=option, search=search)
             store_mmap(option,search,limit_image,mAP_final,mAP_list,label)
 
 if __name__ == "__main__":
     options = ['VGG16', 'RGBHistogram', 'LBP']
-    mAP_list, mAP_final,label = Evaluate(option=options[2], search='Faiss')
+    mAP_list, mAP_final,label, time_each_class = Evaluate(option=options[0], search='Faiss')
     print(mAP_list)
-    store_mmap(options[2],'Faiss',mAP_final,mAP_list,label)
+    store_mmap(options[2],'Faiss',mAP_final,mAP_list,label,time_each_class)
+    print('time',time_each_class)
 
     # tính cho cả thằng eluc + cosion
