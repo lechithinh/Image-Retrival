@@ -64,7 +64,7 @@ def mean_average_precision(ap):
 
 
 
-def Evaluate(image_root = 'dataset', option = 'VGG16', search = 'Faiss', limit_image = 30):
+def Evaluate(image_test, image_root = 'dataset', option = 'VGG16', search = 'Faiss', limit_image = 30):
     image_root = 'dataset'
     FEATURE_PATH = 'feature'
     if os.path.exists(FEATURE_PATH + "/" + option + ".index.bin") == False:
@@ -72,7 +72,7 @@ def Evaluate(image_root = 'dataset', option = 'VGG16', search = 'Faiss', limit_i
         
     AP_list = []  # AP cho mỗi class
     mAP_list = []  # mAP của mỗi class -> tính mean của mAP này
-    previous_label = os.listdir(image_root)[0].split(' ')[0]
+    previous_label = os.listdir(image_test)[0].split(' ')[0]
     # back_dress
     image_count = 0
     label = []
@@ -80,10 +80,10 @@ def Evaluate(image_root = 'dataset', option = 'VGG16', search = 'Faiss', limit_i
     durations = []
     #Thời gian truy vấn trung bình của mỗi class
     time_each_class = []
-    for filename in os.listdir(image_root):
+    for filename in os.listdir(image_test):
         image_count += 1
         
-        uploaded_file = image_root + '/' + filename
+        uploaded_file = image_test + '/' + filename
         class_name = filename.split(' ')[0]  # black dress
         if previous_label == class_name:
             previous_label = class_name
@@ -95,11 +95,13 @@ def Evaluate(image_root = 'dataset', option = 'VGG16', search = 'Faiss', limit_i
             mAP_list.append(mAP)
             # reset mảng AP cho class tiếp theo
             # print(AP_list)
+            # print(mAP_list)
             AP_list = []
             label.append(previous_label)
             previous_label = class_name
             time_each_class.append(np.mean(durations))
             durations = []
+            # break
             # print(mAP_list)
         # faiss / if else chọn search khác
         # danh sách ảnh => toàn bộ ảnh
@@ -117,8 +119,7 @@ def Evaluate(image_root = 'dataset', option = 'VGG16', search = 'Faiss', limit_i
             
             # 30 black dress, black pant
             for u in range(len(retriev)):
-                image_link = (str(image_list[retriev[u]]).split(
-                    '\\')[1]).split(' ')[0]
+                image_link = (str(image_list[retriev[u]]).split('\\')[1]).split(' ')[0]
                 class_list.append(image_link)
         else:
             retriev = Search(query_image,option,search,limit_image)
@@ -131,12 +132,13 @@ def Evaluate(image_root = 'dataset', option = 'VGG16', search = 'Faiss', limit_i
         duration = time.time() - start
         durations.append(duration)
 
+       
         # t.clear()
 
         # black dress -> 30 class khác
         AP = calculate_AP(class_name, class_list)
         AP_list.append(AP)
-        if len(os.listdir(image_root)) == image_count:
+        if len(os.listdir(image_test)) == image_count:
             label.append(previous_label)
             mAP = mean_average_precision(np.array(AP_list))
             mAP_list.append(mAP)
@@ -194,14 +196,14 @@ def store_infor():
     limit_image = 30
     for option in options:
         for search in searchs:
-            mAP_list, mAP_final,label = Evaluate(image_root = 'Test', option=option, search=search)
+            mAP_list, mAP_final,label = Evaluate(image_test='Test', image_root = 'dataset', option=option, search=search)
             store_mmap(option,search,limit_image,mAP_final,mAP_list,label)
 
 if __name__ == "__main__":
     options = ['VGG16', 'RGBHistogram', 'LBP']
-    mAP_list, mAP_final,label, time_each_class = Evaluate(option=options[0], search='Faiss')
-    print(mAP_list)
-    store_mmap(options[2],'Faiss',mAP_final,mAP_list,label,time_each_class)
+    mAP_list, mAP_final,label, time_each_class = Evaluate(image_test='Test', image_root='dataset',option=options[0], search='Cosine')
+    print(mAP_list, mAP_final)
+    store_mmap(options[0],'Cosine',mAP_final,mAP_list,label,time_each_class)
     print('time',time_each_class)
 
     # tính cho cả thằng eluc + cosion
