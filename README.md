@@ -26,17 +26,12 @@ Clone the repository
 git clone https://github.com/lechithinh/Image-Retrival.git
 ```
 
-Install the libraries
-
-```sh
-pip install -r requirement.txt
-```
 ## Structure
 
-Please organize your dataset following this structure: 
+Please organize your code following this structure: 
 
 ```
-IMAGE_RETRIEVAL/
+Main-folder/
 │
 ├── Asset/ 
 |   |   ├── asset1.png
@@ -75,6 +70,46 @@ The test dataset for this project [Test Dataset](https://nodejs.org/)
 
 Be sure follow `The same structure` .
 
+## How to run
+1. Create the virtual environment
+    ```sh
+    python -m venv venv
+    
+    #activate the virtual environment
+    .\venv\Scripts\activate.bat
+    ```
+2. Install required libraries.
+    ```sh
+    pip install -r requirement.txt
+    ```
+3. Follow the structure above to configure the dataset.
+4. Run the web.
+    ```sh
+     streamlit run main.py
+    ```
+5. Configure your username and password on `credentials.json` to login.
+## Try your own dataset
+1. Create your dataset.
+2. Follow the structure to configure the dataset.
+3. Move into `Extract Features` tab on the website.
+4. Select the `Dataset path`.
+5. Select  the `Feature Descriptor`.
+
+## Try search system
+1. Move into `Search System`.
+2. Select either full image or crop image method.
+3. Upload your image,
+4. Configure the `dataset path`
+5. Select the `feature descriptor` 
+6. Choose the number of image results.
+
+## Try Camera system
+1. Move into `Camera System`.
+2. Select either full image or crop image method.
+3. Capture your picture.
+4. Configure the `dataset path`
+5. Select the `feature descriptor` 
+6. Choose the number of image results.
 
 ## License
 
