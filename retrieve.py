@@ -86,7 +86,7 @@ def Search(query_image, feature_extractor, metric, limit_image = 10):
     image_tensor = transform(query_image)
     image_tensor = image_tensor.unsqueeze(0).to(device)
     queryFeatures = extractor.extract_features(image_tensor)
-    print(queryFeatures)
+    
     results = {}
     csv_path = os.path.join("feature/",f"{feature_extractor}.csv")
     with open(csv_path) as f:
@@ -95,9 +95,10 @@ def Search(query_image, feature_extractor, metric, limit_image = 10):
         for row in reader:
             features = [float(x) for x in row[1:]]
             if metric == "Cosine":
-                d = cosine(features, queryFeatures)
+                d = cosine(features, queryFeatures[0])
             elif metric == "Euclidean":
-                d = euclidean(features, queryFeatures)
+                d = euclidean(features, queryFeatures[0])
+            print(d)
             results[row[0]] = d
         f.close() 
     if metric in ["Euclidean", "Cosine"]:
