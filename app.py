@@ -24,8 +24,7 @@ from st_aggrid import AgGrid
 import altair as alt
 from retrieve import Search
 device = torch.device('cpu')
-image_root = 'dataset/black_dress'
-feature_root = 'feature'
+
 
 def Webapp():
     with st.sidebar:
@@ -65,9 +64,13 @@ def Webapp():
                         "Extract", type="primary")
                     
                     if extract_button:
-                        completed_time = Indexing_feature(dataset_path, feature_descriptor)
+                        try:
+                            completed_time = Indexing_feature(dataset_path, feature_descriptor)
+                            st.write('Finished in ' + completed_time + ' seconds')
+                        except:
+                            st.error('Please check the dataset path', icon="🚨")  
                         
-                        st.write('Finished in ' + completed_time + ' seconds')
+                       
     
     elif selected == "Search System":
         st.subheader('Choose image to upload')
@@ -133,64 +136,69 @@ def Webapp():
                 #query image is cropped
                 query_image = cropped_img
                 
-                
-                
-            if uploaded_file is not None and search_button:
-                start = time.time()
-                #For faiss result
-                link_images = []
-                
-                result_images = []
-                
-                if search_model == "Faiss":
-                    #search image
-                    retriev = retrieve_image(query_image, option, limit_image)
-                    #get the dataset to display
-                    image_list = get_image_list(image_root)
-                    for u in range(len(retriev)):
-                        image = Image.open(image_list[retriev[u]])
-                        result_images.append(image)
-                        link_images.append(str(image_list[retriev[u]]))
-                        print(link_images)
-                                                    
-                else:
-                    results = Search(query_image,option,search_model)
-                    for (score, resultID) in results:
-                        result_images.append(resultID)
-                        print(score, resultID)
-                #time
-                end = time.time()
-                finished_time = str(math.floor(end - start))
-                #display result images
-                image_iterator = paginator("Select the total page", result_images)
-                indices_on_page, images_on_page = map(list, zip(*image_iterator))
-                st.image(images_on_page, width=200, caption=indices_on_page)
-                
-                st.markdown('**Finish in ' + finished_time + ' seconds**')
-                #show the chart
-                if search_model == "Faiss":
-                    labels = initialize_result(link_images, search_model)
-                else:
-                    labels = initialize_result(result_images, search_model)
-                
-                #Show the table
-                st.subheader('Statistics')
-                st.data_editor(pd.DataFrame(labels), use_container_width= True, hide_index=1)
-                
-                
-                #Show the bar chart
-                st.subheader('Visualization')
-                chart = (
-                    alt.Chart(pd.DataFrame(labels))
-                    .mark_bar()
-                    .encode(
-                        x='Labels',
-                        y='Values',
-                        color='Labels:N'
-                    ).interactive()
+                            
+            try:
+                image_list = get_image_list(image_root)  
+                if uploaded_file is not None and search_button:
+                    start = time.time()
+                    #For faiss result
+                    link_images = []
                     
-                )
-                st.altair_chart(chart, use_container_width =True)
+                    result_images = []
+                    
+                    if search_model == "Faiss":
+                        #search image
+                        retriev = retrieve_image(query_image, option, limit_image)
+                        #get the dataset to display
+                        image_list = get_image_list(image_root)
+                        for u in range(len(retriev)):
+                            image = Image.open(image_list[retriev[u]])
+                            result_images.append(image)
+                            link_images.append(str(image_list[retriev[u]]))
+                            print(link_images)
+                                                        
+                    else:
+                        results = Search(query_image,option,search_model)
+                        for (score, resultID) in results:
+                            result_images.append(resultID)
+                            print(score, resultID)
+                    #time
+                    end = time.time()
+                    finished_time = str(math.floor(end - start))
+                    #display result images
+                    image_iterator = paginator("Select the total page", result_images)
+                    indices_on_page, images_on_page = map(list, zip(*image_iterator))
+                    st.image(images_on_page, width=230, caption=indices_on_page)
+                    
+                    st.markdown('**Finish in ' + finished_time + ' seconds**')
+                    #show the chart
+                    if search_model == "Faiss":
+                        labels = initialize_result(link_images, search_model)
+                    else:
+                        labels = initialize_result(result_images, search_model)
+                    
+                    #Show the table
+                    st.subheader('Statistics')
+                    st.data_editor(pd.DataFrame(labels), use_container_width= True, hide_index=1)
+                    
+                    
+                    #Show the bar chart
+                    st.subheader('Visualization')
+                    chart = (
+                        alt.Chart(pd.DataFrame(labels))
+                        .mark_bar()
+                        .encode(
+                            x='Labels',
+                            y='Values',
+                            color='Labels:N'
+                        ).interactive()
+                        
+                    )
+                    st.altair_chart(chart, use_container_width =True)
+            except:
+                st.error('Please check the dataset path', icon="🚨")      
+            
+            
     elif selected == "Camera":
         picture = st.camera_input("Take the picture to search")
         # remove file name
@@ -204,7 +212,6 @@ def Webapp():
         image_mode = st.selectbox("Select image mode", ["Full Image", "Crop Image"])
 
         if picture:
-        
             #convert uploaded file to numpy array
             file_bytes = np.asarray(bytearray(picture.read()), dtype=np.uint8)
             opencv_image = cv2.imdecode(file_bytes, 1)
@@ -252,61 +259,66 @@ def Webapp():
                     
                 #query image is cropped
                 query_image = cropped_img
-                
-                
-                
-            if picture is not None and search_button:
-                start = time.time()
-                #For faiss result
-                link_images = []
-                
-                result_images = []
-                
-                if search_model == "Faiss":
-                    #search image
-                    retriev = retrieve_image(query_image, option, limit_image)
-                    #get the dataset to display
-                    image_list = get_image_list(image_root)
-                    for u in range(len(retriev)):
-                        image = Image.open(image_list[retriev[u]])
-                        result_images.append(image)
-                        link_images.append(str(image_list[retriev[u]]))
-                        print(link_images)
-                                                    
-                else:
-                    results = Search(query_image,option,search_model)
-                    for (score, resultID) in results:
-                        result_images.append(resultID)
-                        print(score, resultID)
-                #time
-                end = time.time()
-                finished_time = str(math.floor(end - start))
-                #display result images
-                image_iterator = paginator("Select the total page", result_images)
-                indices_on_page, images_on_page = map(list, zip(*image_iterator))
-                st.image(images_on_page, width=200, caption=indices_on_page)
-                
-                st.markdown('**Finish in ' + finished_time + ' seconds**')
-                #show the chart
-                if search_model == "Faiss":
-                    labels = initialize_result(link_images, search_model)
-                else:
-                    labels = initialize_result(result_images, search_model)
-                
-                #Show the table
-                st.subheader('Statistics')
-                st.data_editor(pd.DataFrame(labels), use_container_width= True, hide_index=1)
-                
-                #Show the bar chart
-                st.subheader('Visualization')
-                chart = (
-                    alt.Chart(pd.DataFrame(labels))
-                    .mark_bar()
-                    .encode(
-                        x='Labels',
-                        y='Values',
-                        color='Labels:N'
-                    ).interactive()
+           
+            #check the path is valid    
+            try:
+                image_list = get_image_list(image_root)
+                                
+                if picture is not None and search_button:
+                    start = time.time()
+                    #For faiss result
+                    link_images = []
                     
-                )
-                st.altair_chart(chart, use_container_width =True)
+                    result_images = []
+                    
+                    if search_model == "Faiss":
+                        #search image
+                        retriev = retrieve_image(query_image, option, limit_image)
+                        #get the dataset to display
+                    
+                        image_list = get_image_list(image_root)
+                        for u in range(len(retriev)):
+                            image = Image.open(image_list[retriev[u]])
+                            result_images.append(image)
+                            link_images.append(str(image_list[retriev[u]]))
+                            print(link_images)
+                                                        
+                    else:
+                        results = Search(query_image,option,search_model)
+                        for (score, resultID) in results:
+                            result_images.append(resultID)
+                            print(score, resultID)
+                    #time
+                    end = time.time()
+                    finished_time = str(math.floor(end - start))
+                    #display result images
+                    image_iterator = paginator("Select the total page", result_images)
+                    indices_on_page, images_on_page = map(list, zip(*image_iterator))
+                    st.image(images_on_page, width=230, caption=indices_on_page)
+                    
+                    st.markdown('**Finish in ' + finished_time + ' seconds**')
+                    #show the chart
+                    if search_model == "Faiss":
+                        labels = initialize_result(link_images, search_model)
+                    else:
+                        labels = initialize_result(result_images, search_model)
+                    
+                    #Show the table
+                    st.subheader('Statistics')
+                    st.data_editor(pd.DataFrame(labels), use_container_width= True, hide_index=1)
+                    
+                    #Show the bar chart
+                    st.subheader('Visualization')
+                    chart = (
+                        alt.Chart(pd.DataFrame(labels))
+                        .mark_bar()
+                        .encode(
+                            x='Labels',
+                            y='Values',
+                            color='Labels:N'
+                        ).interactive()
+                        
+                    )
+                    st.altair_chart(chart, use_container_width =True)
+            except:
+                st.error('Please check the dataset path', icon="🚨")  
