@@ -29,15 +29,20 @@ def paginator(label, items, items_per_page=50, on_sidebar=True):
     import itertools
     return itertools.islice(enumerate(items), min_index, max_index)
 
-def initialize_result(results):
-    labels = {'labels': [],
-              'values': []}
+def initialize_result(results, search_model):
+    labels = {'Labels': [],
+              'Values': []}
+    
     for i in range(len(results)):
-        label = (results[i].split('\\')[-1]).split(' ')[0]
-        if label not in labels['labels']:
-            labels['labels'].append(label)
-            labels['values'].append(1)
+        if search_model == "Faiss":
+            label = (results[i].split('\\')[-1]).split(' ')[0]
         else:
-            indx = list(labels['labels']).index(label)
-            labels['values'][indx] += 1
+            label = (results[i].split('/')[-1]).split(' ')[0]
+        if label not in labels['Labels']:
+            labels['Labels'].append(label)
+            labels['Values'].append(1)
+        else:
+            indx = list(labels['Labels']).index(label)
+            labels['Values'][indx] += 1
     return labels
+

@@ -9,7 +9,7 @@ from PIL import Image
 from helpers import paginator
 from streamlit_cropper import st_cropper
 
-from descriptor import MyVGG16, MyResnet50, RGBHistogram, LBP
+from descriptor import MyVGG16, RGBHistogram, LBP
 from dataloader import get_transformation
 
 
@@ -48,8 +48,6 @@ def retrieve_image(query_image, feature_extractor, limit_image = 10):
     
     if feature_extractor == 'VGG16':
         extractor = MyVGG16(device)
-    elif feature_extractor == 'Resnet50':
-        extractor = MyResnet50(device)
     elif feature_extractor == 'RGBHistogram':
         extractor = RGBHistogram(device)
     elif feature_extractor == 'LBP':
@@ -74,8 +72,6 @@ def Search(query_image, feature_extractor, metric, limit_image = 10):
     
     if feature_extractor == 'VGG16':
         extractor = MyVGG16(device)
-    elif feature_extractor == 'Resnet50':
-        extractor = MyResnet50(device)
     elif feature_extractor == 'RGBHistogram':
         extractor = RGBHistogram(device)
     elif feature_extractor == 'LBP':
@@ -98,7 +94,6 @@ def Search(query_image, feature_extractor, metric, limit_image = 10):
                 d = cosine(features, queryFeatures[0])
             elif metric == "Euclidean":
                 d = euclidean(features, queryFeatures[0])
-            print(d)
             results[row[0]] = d
         f.close() 
     if metric in ["Euclidean", "Cosine"]:
@@ -110,6 +105,11 @@ def Search(query_image, feature_extractor, metric, limit_image = 10):
         return results[:limit_image]
     else:
         return results
-uploaded_file = 'dataset' + '/' + 'white_pants (2).jpg'
-query_image = Image.open(uploaded_file)
-print(Search(query_image,'RGBHistogram','Euclidean'))
+
+def main():  
+    uploaded_file = 'dataset' + '/' + 'white_pants (2).jpg'
+    query_image = Image.open(uploaded_file)
+    print(Search(query_image,'RGBHistogram','Euclidean'))
+    
+if __name__ == "__main__":
+    main()
