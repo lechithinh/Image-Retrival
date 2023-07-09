@@ -1,7 +1,7 @@
 import streamlit as st
 import numpy as np
 import faiss
-
+from PIL import Image
 
 def get_faiss_indexer(shape):
 
@@ -45,4 +45,22 @@ def initialize_result(results, search_model):
             indx = list(labels['Labels']).index(label)
             labels['Values'][indx] += 1
     return labels
+
+
+def LoginPageInfor():
+    st.markdown(f'''
+            <h2 style='text-align: center;  color: black;'>Image Retrieval System </h2>
+            ''', unsafe_allow_html=True)
+    st.write(f"Introducing our game-changing **image retrieval system**. With advanced algorithms and machine learning, it revolutionizes image searches, delivering precise results effortlessly. Say goodbye to endless scrolling and hello to a new era of image discovery.")
+    col1, col2, col3 = st.columns(3)
+    with col1: 
+        image1 = Image.open('assets/1.png')
+        st.image(image1, width=300, caption="Image Search")
+    with col2:
+        image3 = Image.open('assets/2.png')
+        st.image(image3, width=300, caption="Visualization")
+    with col3: 
+        image3 = Image.open('assets/3.png')
+        st.image(image3, width=300, caption="Camera Search")
+      
 

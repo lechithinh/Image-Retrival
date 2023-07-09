@@ -2,6 +2,7 @@ import streamlit as st
 import streamlit_authenticator as stauth
 from app import Webapp
 import time
+from helpers import LoginPageInfor
 
 names = ['Thinh Le', 'Thien', "Tony Tri"]
 usernames = ['lechithinh', 'huynhcongthien', 'nguyenminhtri']
@@ -32,10 +33,8 @@ if st.session_state['authentication_status']: #Login successfully
         authenticator.logout('Logout', 'sidebar')
 
 elif st.session_state['authentication_status'] == False: 
-    #Our demo image
-    st.image('http://placekitten.com/300/250')
     st.sidebar.error('Username/password is incorrect')
+    LoginPageInfor()
 elif st.session_state['authentication_status'] == None:
-    #Our demo image
-    st.image('http://placekitten.com/300/250')
     st.sidebar.warning('Please enter your username and password')
+    LoginPageInfor()
