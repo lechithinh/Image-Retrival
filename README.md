@@ -41,9 +41,9 @@ We are thrilled to introduce our cutting-edge image retrieval system that is pow
 
 Here are the techs we implemented for this project
 
--  [Python](https://nodejs.org/): 
--  [Python](https://nodejs.org/): 
--  [Python](https://nodejs.org/): 
+-  [Python](https://docs.python.org/3/)
+-  [Streamlit](https://docs.streamlit.io/)
+-  [Pytorch](https://pytorch.org/vision/main/models/generated/torchvision.models.vgg16.html#torchvision.models.VGG16_Weights)
 
 ## Installation
 Clone the repository
@@ -84,17 +84,18 @@ Main-folder/
 
 ## Dataset
 
-The dataset for this project is [Fashion Dataset](https://nodejs.org/)
+The dataset for this project is [Fashion Dataset](https://drive.google.com/file/d/1k6467Iv7us87foba77YGtrY36fuLz9G-/view?usp=drive_link)
 + There are 24 class
 + Each class contains 30 images
 + The total images is 720
 
-The test dataset for this project [Test Dataset](https://nodejs.org/)
-+ There are 24 class
-+ Each class contains 7 images
-+ The total images is 168
+
 
 Be sure follow `The same structure` .
+
+## Extracted Features
++ These are features that we extracted based on the dataset provided above  [ Feature](https://drive.google.com/drive/folders/1syWNHdNG1BcOM_3YlHOLbxFdposJ3U6E?usp=drive_link)
++ You you download this one and run your code immediately or you can use the dataset above and extract these features on your own.
 
 ## How to run
 1. Create the virtual environment
@@ -136,9 +137,3 @@ Be sure follow `The same structure` .
 4. Configure the `dataset path`
 5. Select the `feature descriptor` 
 6. Choose the number of image results.
-
-## License
-
-MIT
-
-
